@@ -1,5 +1,9 @@
 # EA_Crossover-Navigator
 
+## Download Link
+You can download the compiled EA from the following link:
+- [Download Crossover Navigator EA](https://github.com/syarief02/EA_Crossover-Navigator/raw/refs/heads/main/ma50.ex4)
+
 ## Overview
 The **Crossover Navigator** is an Expert Advisor (EA) designed for trading in MetaTrader 4 using a 50-period moving average (MA50) crossover strategy. This EA aims to identify potential buy and sell opportunities based on the relationship between the current price and the MA50.
 
