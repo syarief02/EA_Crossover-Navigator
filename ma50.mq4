@@ -4,24 +4,45 @@
 // Recommended timeframe: M5, choose ranging pair.
 // Join our Telegram channel: t.me/EABudakUbat
 // Contact: +60194961568 (Budak Ubat)
+#define VERSION "1.00"
+#property version VERSION
+#property link "https://m.me/EABudakUbat"
+#property description "This is EA_Crossover-Navigator"
+#property description "Recommended timeframe M5, choose ranging pair."
+#property description "Recommended using a cent account for 100 USD capital"
+#property description "Join our Telegram channel: t.me/EABudakUbat"
+#property description "Facebook: m.me/EABudakUbat"
+#property description "+60194961568 (Budak Ubat)"
+#property icon "\\Images\\bupurple.ico"
+#property strict
+
+#include <WinUser32.mqh>
+#include <stdlib.mqh>
+
+#define COPYRIGHT "Copyright © 2024, BuBat's Trading"
+#property copyright COPYRIGHT
 
 // Input parameters
-input int MA_Period = 50; // Moving Average period
-input double LotSize = 0.1; // Lot size for trades
-input double Slippage = 3; // Slippage for orders
-input double TakeProfitPips = 4; // Take Profit in pips
-input double StopLossPips = 30; // Stop Loss in pips
+input int MA_Period = 50;          // Moving Average period
+input double LotSize = 0.1;         // Lot size for trades
+input int Slippage = 3;             // Slippage for orders
+input double TakeProfitPips = 4.0;  // Take Profit in pips
+input double StopLossPips = 30.0;   // Stop Loss in pips
 
 // Global variables
 double MA_Value;
+
+// Expert information
+#define EXPERT_NAME "[https://t.me/SyariefAzman] "
+extern string EA_Name = EXPERT_NAME; // EA name
+string Owner = "BUDAK UBAT";         // Owner's name
+string Contact = "WHATSAPP/TELEGRAM: +60194961568"; // Contact information
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                     |
 //+------------------------------------------------------------------+
 int OnInit() {
-    // Initialize chart comment
-    UpdateChartComment(); // Call to set the initial chart comment
-
+    UpdateChartComment(); // Initialize chart comment
     return INIT_SUCCEEDED;
 }
 
@@ -29,43 +50,60 @@ int OnInit() {
 //| Expert deinitialization function                                   |
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
-    // Clear chart comment on deinitialization
-    Comment("");
+    Comment(""); // Clear chart comment on deinitialization
 }
 
 //+------------------------------------------------------------------+
 //| Expert tick function                                             | 
 //+------------------------------------------------------------------+
 void OnTick() {
-    // Calculate the MA50 value
-    MA_Value = iMA(NULL, 0, MA_Period, 0, MODE_SMA, PRICE_CLOSE, 0);
+    MA_Value = iMA(NULL, 0, MA_Period, 0, MODE_SMA, PRICE_CLOSE, 0); // Calculate the MA50 value
 
-    // Check for buy conditions
-    if (Close[1] < MA_Value && Close[0] > MA_Value) {
-        // Buy only if no open buy orders
-        if (OrdersTotal() == 0 || !IsOrderType(OP_BUY)) {
-            double tp_buy = Ask + TakeProfitPips * Point; // Calculate TP for buy
-            double sl_buy = Ask - StopLossPips * Point;   // Calculate SL for buy
-            if (OrderSend(Symbol(), OP_BUY, LotSize, Ask, Slippage, sl_buy, tp_buy, "Buy Order", 0, 0, clrGreen) < 0) {
-                Print("Error opening buy order: ", GetLastError());
-            }
-        }
+    // Check for buy conditions and open buy order if conditions are met
+    if (ShouldOpenBuy()) {
+        OpenOrder(OP_BUY);
     }
 
-    // Check for sell conditions
-    if (Close[1] > MA_Value && Close[0] < MA_Value) {
-        // Sell only if no open sell orders
-        if (OrdersTotal() == 0 || !IsOrderType(OP_SELL)) {
-            double tp_sell = Bid - TakeProfitPips * Point; // Calculate TP for sell
-            double sl_sell = Bid + StopLossPips * Point;   // Calculate SL for sell
-            if (OrderSend(Symbol(), OP_SELL, LotSize, Bid, Slippage, sl_sell, tp_sell, "Sell Order", 0, 0, clrRed) < 0) {
-                Print("Error opening sell order: ", GetLastError());
-            }
-        }
+    // Check for sell conditions and open sell order if conditions are met
+    if (ShouldOpenSell()) {
+        OpenOrder(OP_SELL);
     }
 
-    // Update chart comment
-    UpdateChartComment();
+    UpdateChartComment(); // Update chart comment
+}
+
+//+------------------------------------------------------------------+
+//| Check if conditions are met to open a buy order                  |
+//+------------------------------------------------------------------+
+bool ShouldOpenBuy() {
+    return Close[1] < MA_Value && Close[0] > MA_Value && (OrdersTotal() == 0 || !IsOrderType(OP_BUY));
+}
+
+//+------------------------------------------------------------------+
+//| Check if conditions are met to open a sell order                 |
+//+------------------------------------------------------------------+
+bool ShouldOpenSell() {
+    return Close[1] > MA_Value && Close[0] < MA_Value && (OrdersTotal() == 0 || !IsOrderType(OP_SELL));
+}
+
+//+------------------------------------------------------------------+
+//| Open an order (buy or sell) based on order type                  |
+//+------------------------------------------------------------------+
+void OpenOrder(int orderType) {
+    double tp, sl;
+    if (orderType == OP_BUY) {
+        tp = Ask + TakeProfitPips * Point; // Calculate Take Profit for buy
+        sl = Ask - StopLossPips * Point;    // Calculate Stop Loss for buy
+        if (OrderSend(Symbol(), OP_BUY, LotSize, Ask, Slippage, sl, tp, "Buy Order", 0, 0, clrGreen) < 0) {
+            Print("Error opening buy order: ", GetLastError());
+        }
+    } else if (orderType == OP_SELL) {
+        tp = Bid - TakeProfitPips * Point; // Calculate Take Profit for sell
+        sl = Bid + StopLossPips * Point;    // Calculate Stop Loss for sell
+        if (OrderSend(Symbol(), OP_SELL, LotSize, Bid, Slippage, sl, tp, "Sell Order", 0, 0, clrRed) < 0) {
+            Print("Error opening sell order: ", GetLastError());
+        }
+    }
 }
 
 //+------------------------------------------------------------------+
@@ -74,16 +112,18 @@ void OnTick() {
 void UpdateChartComment() {
     string comment = StringFormat(
         "MA50 Crossover EA\n"
-        "Author: Budak Ubat\n"
+        "Author: %s\n"
+        "Owner: %s\n"
+        "Contact: %s\n"
         "Current MA50: %.5f\n"
         "Lot Size: %.2f\n"
         "Take Profit: %.2f pips\n"
         "Stop Loss: %.2f pips\n"
         "Date: %s\n"
         "Time: %s\n",
-        MA_Value, LotSize, TakeProfitPips, StopLossPips,
-        TimeToString(TimeCurrent(), TIME_DATE), // Current date
-        TimeToString(TimeCurrent(), TIME_MINUTES) // Current time
+        "Budak Ubat", Owner, Contact, MA_Value, LotSize, TakeProfitPips, StopLossPips,
+        TimeToString(TimeCurrent(), TIME_DATE),
+        TimeToString(TimeCurrent(), TIME_MINUTES)
     );
     Comment(comment); // Display the prepared comment on the chart
 }
