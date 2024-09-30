@@ -54,7 +54,7 @@ void OnDeinit(const int reason) {
 }
 
 //+------------------------------------------------------------------+
-//| Expert tick function                                             | 
+//| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
     // Calculate the current value of the 50-period moving average
@@ -147,3 +147,38 @@ bool IsOrderType(int orderType) {
     }
     return false; // Return false if no such order is found
 }
+
+// Function to check if the lot size is valid
+bool IsValidLotSize(double lotSize) {
+    double minLot = MarketInfo(Symbol(), MODE_MINLOT); // Minimum lot size
+    double maxLot = MarketInfo(Symbol(), MODE_MAXLOT); // Maximum lot size
+    double lotStep = MarketInfo(Symbol(), MODE_LOTSTEP); // Lot size step
+
+    // Check if the lot size is within the allowed range and is a multiple of the lot step
+    if (lotSize < minLot || lotSize > maxLot) {
+        Print("Invalid lot size: ", lotSize, ". Must be between ", minLot, " and ", maxLot);
+        return false;
+    }
+    if (MathMod(lotSize, lotStep) != 0) {
+        Print("Invalid lot size: ", lotSize, ". Must be a multiple of ", lotStep);
+        return false;
+    }
+    return true; // Lot size is valid
+}
+
+// Example usage before placing an order
+void PlaceOrder() {
+    double lotSize = globalLotSize; // Use the global lot size
+    if (IsValidLotSize(lotSize)) {
+        // Place your order here
+        int ticket = OrderSend(Symbol(), OP_BUY, lotSize, Ask, Slippage, 0, 0, "Buy Order", 0, 0, clrGreen);
+        if (ticket < 0) {
+            Print("Error opening order: ", GetLastError());
+        }
+    } else {
+        Print("Order not placed due to invalid lot size.");
+    }
+}
+
+// Global variable for lot size
+double globalLotSize = 0.1; // Example global lot size
