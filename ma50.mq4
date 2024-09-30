@@ -54,7 +54,7 @@ void OnDeinit(const int reason) {
 }
 
 //+------------------------------------------------------------------+
-//| Expert tick function                                             |
+//| Expert tick function                                             | 
 //+------------------------------------------------------------------+
 void OnTick() {
     // Calculate the current value of the 50-period moving average
@@ -94,18 +94,26 @@ bool ShouldOpenSell() {
 //+------------------------------------------------------------------+
 void OpenOrder(int orderType) {
     double tp, sl; // Variables to hold the calculated take profit and stop loss levels
+    double lotSize = LotSize; // Use the input lot size
+
+    // Validate the lot size before placing the order
+    if (!IsValidLotSize(lotSize)) {
+        Print("Invalid lot size: ", lotSize);
+        return; // Exit the function if the lot size is invalid
+    }
+
     if (orderType == OP_BUY) { // Check if the order type is buy
         tp = Ask + TakeProfitPips * Point; // Calculate Take Profit for buy order
         sl = Ask - StopLossPips * Point;    // Calculate Stop Loss for buy order
         // Send the buy order
-        if (OrderSend(Symbol(), OP_BUY, LotSize, Ask, Slippage, sl, tp, "Buy Order", 0, 0, clrGreen) < 0) {
+        if (OrderSend(Symbol(), OP_BUY, lotSize, Ask, Slippage, sl, tp, "Buy Order", 0, 0, clrGreen) < 0) {
             Print("Error opening buy order: ", GetLastError()); // Print error if order fails
         }
     } else if (orderType == OP_SELL) { // Check if the order type is sell
         tp = Bid - TakeProfitPips * Point; // Calculate Take Profit for sell order
         sl = Bid + StopLossPips * Point;    // Calculate Stop Loss for sell order
         // Send the sell order
-        if (OrderSend(Symbol(), OP_SELL, LotSize, Bid, Slippage, sl, tp, "Sell Order", 0, 0, clrRed) < 0) {
+        if (OrderSend(Symbol(), OP_SELL, lotSize, Bid, Slippage, sl, tp, "Sell Order", 0, 0, clrRed) < 0) {
             Print("Error opening sell order: ", GetLastError()); // Print error if order fails
         }
     }
@@ -148,7 +156,9 @@ bool IsOrderType(int orderType) {
     return false; // Return false if no such order is found
 }
 
-// Function to check if the lot size is valid
+//+------------------------------------------------------------------+
+//| Function to check if the lot size is valid                       |
+//+------------------------------------------------------------------+
 bool IsValidLotSize(double lotSize) {
     double minLot = MarketInfo(Symbol(), MODE_MINLOT); // Minimum lot size
     double maxLot = MarketInfo(Symbol(), MODE_MAXLOT); // Maximum lot size
@@ -165,20 +175,3 @@ bool IsValidLotSize(double lotSize) {
     }
     return true; // Lot size is valid
 }
-
-// Example usage before placing an order
-void PlaceOrder() {
-    double lotSize = globalLotSize; // Use the global lot size
-    if (IsValidLotSize(lotSize)) {
-        // Place your order here
-        int ticket = OrderSend(Symbol(), OP_BUY, lotSize, Ask, Slippage, 0, 0, "Buy Order", 0, 0, clrGreen);
-        if (ticket < 0) {
-            Print("Error opening order: ", GetLastError());
-        }
-    } else {
-        Print("Order not placed due to invalid lot size.");
-    }
-}
-
-// Global variable for lot size
-double globalLotSize = 0.1; // Example global lot size
