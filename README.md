@@ -1,6 +1,18 @@
 # EA_Crossover-Navigator
 
-## Download Link
+## Table of Contents
+- [Download](#download)
+- [Overview](#overview)
+- [Features](#features)
+- [Input Parameters](#input-parameters)
+- [How It Works](#how-it-works)
+- [Usage Instructions](#usage-instructions)
+- [License](#license)
+- [Contributing](#contributing)
+- [Contact Information](#contact-information)
+- [Disclaimer](#disclaimer)
+
+## Download
 You can download the compiled EA from the following link:
 - [Download Crossover Navigator EA](https://github.com/syarief02/EA_Crossover-Navigator/raw/refs/heads/main/ma50.ex4)
 
@@ -33,6 +45,12 @@ The **Crossover Navigator** is an Expert Advisor (EA) designed for trading in Me
 3. **Attach to Chart**: Open a chart for the desired currency pair and timeframe (recommended: M5) and attach the EA.
 4. **Configure Settings**: Adjust the input parameters as needed in the EA settings.
 5. **Start Trading**: Enable automated trading in MetaTrader 4 to allow the EA to execute trades based on the defined strategy.
+
+## License
+This EA is licensed under the MIT License. It is provided for free and should not be sold or distributed for profit. You are free to use, modify, and share this EA, but please respect the terms of the license.
+
+## Contributing
+We welcome contributions! If you have ideas for improvements or new features, feel free to fork the repository, make your modifications, and submit a pull request. Your contributions can enhance this EA and benefit the trading community.
 
 ## Contact Information
 For support or inquiries, please contact:
