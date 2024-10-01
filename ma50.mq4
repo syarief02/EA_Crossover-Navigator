@@ -169,9 +169,9 @@ bool IsValidLotSize(double lotSize) {
         Print("Invalid lot size: ", lotSize, ". Must be between ", minLot, " and ", maxLot);
         return false;
     }
-    if (MathMod(lotSize, lotStep) != 0) {
-        Print("Invalid lot size: ", lotSize, ". Must be a multiple of ", lotStep);
-        return false;
-    }
+    // if (MathMod(lotSize, lotStep) != 0) {
+    //     Print("Invalid lot size: ", lotSize, ". Must be a multiple of ", lotStep);
+    //     return false;
+    // }
     return true; // Lot size is valid
 }
